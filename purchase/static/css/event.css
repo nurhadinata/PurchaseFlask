@@ -1,0 +1,44 @@
+.event-container {
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.event-table{
+    min-width:920px;
+}
+
+.bootstrap-select .btn {
+    width :100%;
+    font-size: 16px;
+    background-color : inherit;
+    border: none !important; 
+    border-radius: 0 !important;
+    border-bottom: 1px solid #666666 !important;
+    box-shadow: none !important;
+    /* margin-top: 5px;
+    margin-bottom: 5px; */
+    padding-left: 0;
+    outline: 0 !important;
+}
+
+.bootstrap-select.update-form .btn, .update-form input{
+    padding: 0;
+    
+}
+
+.bootstrap-select.update-form{
+    width: 100% !important;
+}
+
+.bootstrap-select.update-form .dropdown-menu{
+    min-width: 0px !important;
+    /* max-width: 300px !important; */
+}
+
+.bootstrap-select .btn:focus{
+    outline: none;
+    border: none; 
+    box-shadow: none !important;
+    border-bottom: 2px solid #e27f34 !important;
+    outline: 0 !important;
+}

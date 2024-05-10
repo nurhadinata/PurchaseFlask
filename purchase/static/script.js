@@ -25,6 +25,65 @@ if(isNavbarExpanded && window.innerWidth >= 768){
     showNavbar('header-toggle','nav-bar','body-pd','header')
 }
 
+function testFunction(eventId){
+
+        const testCol = document.querySelectorAll('.event-info'+eventId)
+        
+        if(testCol){
+            testCol.forEach(l=> l.classList.toggle('hidden'))
+        }
+            // add padding to body
+}
+
+function updateEvent(eventId){
+    var fund = document.getElementById("fund-update"+eventId).value
+    var cashier = document.getElementById("cashier-update"+eventId).value
+    var purchaser = document.getElementById("purchaser-update"+eventId).value
+
+    var updatedData = {
+        id: eventId, 
+        fund: fund,
+        cashier: cashier,
+        purchaser: purchaser
+    };
+    
+    // Send POST request to update data
+    $.ajax({
+        url: '/purchase/event/update',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(updatedData),
+        success: function(response) {
+            // Request was successful, handle response here
+            document.getElementById("fund-info"+eventId).innerHTML = fund
+            document.getElementById("cashier-info"+eventId).innerHTML = cashier
+            document.getElementById("purchaser-info"+eventId).innerHTML = purchaser
+            console.log(response.message);
+        },
+        error: function(xhr, status, error) {
+            // Request failed
+            console.error('Request failed: ' + error);
+        }
+    });
+
+    testFunction(eventId)
+
+
+    // console.log(fund)
+
+}
+
+function cancelUpdateEvent(eventId){
+    document.getElementById("fund-update"+eventId).value = document.getElementById("fund-info"+eventId).innerHTML.trim()
+    document.getElementById("cashier-update"+eventId).value = document.getElementById("cashier-info"+eventId).innerHTML.trim()
+    document.getElementById("purchaser-update"+eventId).value = document.getElementById("purchaser-info"+eventId).innerHTML.trim()
+
+    testFunction(eventId)
+}
+
+
+
+
 var selectedMenu = document.getElementById('selected-menu').innerText
 
 if(selectedMenu=="farmer-list"){
@@ -110,6 +169,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     });
 
     $(document).ready(function() {
+        $('.selectpicker').selectpicker();
         
         const linkColor = document.querySelectorAll('.nav_link')
         

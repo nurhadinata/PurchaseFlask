@@ -1,4 +1,6 @@
+from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
+from datetime import datetime
 
 db = SQLAlchemy()
 session = db.session
@@ -209,6 +211,38 @@ class ResUserOdoo(db.Model):
     # __table_args__ = (
     #     db.UniqueConstraint('login', 'website_id', name='res_users_login_website_key'),
     # )
+
+
+class PurchaseEvent(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    fund = db.Column(db.Float, default=100000)
+    ics = db.Column(db.String)
+    purchaser = db.Column(db.Integer, db.ForeignKey('res_user_odoo.id'))
+    cashier = db.Column(db.Integer, db.ForeignKey('res_user_odoo.id'))
+    ap_name = db.Column(db.String)
+    ip_address = db.Column(db.String)
+    created_at = db.Column(db.DateTime, nullable=False)
+
+    def __init__(self, fund, purchaser, cashier):
+        self.fund = fund
+        self.purchaser = purchaser
+        self.cashier = cashier
+        self.ip_address = request.remote_addr
+        self.created_at = datetime.utcnow()
+        self.generate_name()
+
+    def generate_name(self):
+        # Get current date in the format YYYYMMDD
+        date_str = self.created_at.strftime('%Y%m%d')
+        # Count existing posts for the current date
+        post_count = PurchaseEvent.query.filter(PurchaseEvent.created_at >= datetime.combine(self.created_at.date(), datetime.min.time())).count()
+        # Set the name using the format PE-date-index
+        self.name = f"PE{date_str}-{post_count + 1}"
+
+    def __repr__(self):
+        return f'<PurchaseEvent {self.purchase_event}>'
+
 
 
 

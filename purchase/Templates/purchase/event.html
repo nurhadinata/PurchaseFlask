@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% block plugin %}
+
+{% endblock %}
+
+{% block header %}
+    <b>Purchase Event</b>
+{% endblock %}
+
+{% block content %}
+<span id="selected-menu" style="display: none;">farmer-list</span>
+
+<div class="card">
+    
+    <div class="card-body">
+
+        <form action="/purchase/event/add" method="post">
+            <!-- <table style="width: 100%;"> -->
+                <!-- <tr >
+                    <td>Cashier</td>
+                    <td>Purchaser</td>
+                    <td>Fund</td>
+                    <td></td>
+                </tr> -->
+                <div class="row">
+                    <!-- <td> -->
+                        <div class="form-floating col-sm-12 col-lg">
+                            <select class="form-control selectpicker" name="cashier" id="cashier" data-live-search="true">
+                                {% for user in users %}
+                                    <option value={{user.id}}>{{user.login}}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="control-label" for="cashier">Cashier</label>
+                        </div>
+                       
+                    <!-- </td> -->
+                    <!-- <td> -->
+                        <div class="form-floating col-sm-12 col-lg">
+                            <select class="form-control selectpicker" name="purchaser" id="purchaser" data-live-search="true">
+                                {% for user in users %}
+                                    <option value={{user.id}}>{{user.login}}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="control-label" for="purchaser">Purchaser</label>
+                        </div>
+                    <!-- </td>
+                    <td> -->
+                        <div class="form-floating col-sm-12 col-lg">
+                            <input class="form-control" type="number" id="fund" name="fund" value="0">
+                            <label class="control-label" for="fund">Fund</label>
+                        </div>
+                        
+                    <!-- </td>
+                    <td> -->
+                        <div class="col col-sm-6 col-lg-1" style="display: flex; align-items: center;">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                        
+                    <!-- </td> -->
+                </tr>
+            <!-- </table> -->
+              
+            <!-- <button type="submit" class="btn btn-primary">Submit</button> -->
+        </form>
+
+        <div class="event-container">
+            <table class="table event-table" style="width: 100%; margin-top: 32px;">
+                <tr>
+                    <th style="width: 30%;">
+                        Purchase Event
+                    </th>
+                    <th style="width: 15%;">
+                        Cashier
+                    </th>
+                    <th style="width: 15%;">
+                        Purchaser
+                    </th>
+                    <th style="width: 15%;">
+                        Fund
+                    </th>
+                    <th style="width: 15%;">
+                        IP Address
+                    </th>
+                    <th style="width: 10%;">
+                        Edit
+                    </th>
+                </tr>
+                {% for event in events %}
+                    <tr class="event-row">
+                        <td>
+                            {{event.name}}
+                        </td>
+                        <td>
+                            <div class="event-info{{event.id}}" id="cashier-info{{event.id}}">
+                                {{event.cashier}}
+                            </div>
+                            <div class="event-info{{event.id}} hidden">
+                                <select class="update-form selectpicker" name="cashier" id="cashier-update{{event.id}}" data-live-search="true">
+                                    {% for user in users %}
+                                        <option value={{user.id}} {% if user.id == event.cashier %}selected{% endif %} >{{user.id}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="event-info{{event.id}}" id="purchaser-info{{event.id}}">
+                                {{event.purchaser}}
+                            </div>
+                            <div class="event-info{{event.id}} hidden">
+                                <select class="update-form selectpicker" name="purchaser" id="purchaser-update{{event.id}}"  data-live-search="true">
+                                    {% for user in users %}
+                                        <option value={{user.id}} {% if user.id == event.purchaser %}selected{% endif %} >{{user.id}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                        </td>
+                        <td class="fund-column">
+                            <div class="event-info{{event.id}}" id="fund-info{{event.id}}">
+                                {{event.fund}}
+                            </div>
+                            <div class="update-form event-info{{event.id}} hidden">
+                                <input type="number" id="fund-update{{event.id}}" name="fund" value="{{event.fund}}">
+                            </div>
+                        </td>
+                        <td>
+                            {{event.ip_address}}
+                        </td>
+                        <td>
+                            <span class="event-id" style="display: none;">{{event.id}}</span>
+                            <button onclick="testFunction('{{ event.id }}')" type="button" class="btn btn-secondary event-info{{event.id}}" id="test1-btn">
+                                <span><i class='bx bxs-pencil'></i></span>
+                            </button>
+                            <button onclick="updateEvent('{{ event.id }}')" type="button" class="btn btn-success event-info{{event.id}} hidden">
+                                <span><i class='bx bx-check' ></i></span>
+                            </button>
+                            <button onclick="cancelUpdateEvent('{{ event.id }}')" type="button" class="btn btn-danger event-info{{event.id}} hidden">
+                                <span><i class='bx bx-x'></i></span>
+                            </button>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+        
+        
+
+    
+</div>
+
+
+{% endblock %}
+{% block script_plugin %}
+<!-- Bootstrap CSS -->
+<!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"> -->
+
+<!-- Bootstrap Select CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.min.css">
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Bootstrap JS -->
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+
+
+<!-- Bootstrap Select JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/event.css') }}">
+{% endblock %}

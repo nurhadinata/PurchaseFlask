@@ -297,7 +297,7 @@ a{
         left: 0;
         padding: 1rem 1rem 0 0
     }
-    .show{
+    .l-navbar.show{
         width: calc(var(--nav-width) + 156px)
     }
     .body-pd{
@@ -324,7 +324,7 @@ a{
         left: 0;
         padding: 1rem 1rem 0 0
     }
-    .show{
+    .l-navbar.show{
         width: calc(68px + 156px)
     }
     .body-pd{
@@ -368,18 +368,22 @@ textarea:focus,
     color: #666666 !important;
 } 
 
+.form-control{
+    padding-left: 0 !important;
+}
+
 .dropdown{
     height: 100%;
 }
 
-.dropdown-toggle::after {
+.menu-dropdown-toggle::after {
     color: var(--first-color);
     display: none;
     outline: none;
     border:none;
   }
 
-.dropdown-toggle {
+.menu-dropdown-toggle {
     width: 40px; /* Adjust as needed */
     box-shadow: none;
     font-size: 16px;
@@ -390,13 +394,13 @@ textarea:focus,
     margin: 0;
 }
 
-.dropdown-toggle:focus {
+.menu-dropdown-toggle:focus {
     color: var(--first-color);
     outline: none;
     border:none;
 }
 
-.dropdown-toggle:hover{
+.menu-dropdown-toggle:hover{
     color: var(--first-color);
 }
 
@@ -432,9 +436,10 @@ textarea:focus,
 
 .round-btn,
 .round-btn:focus,
-.btn:focus{
+.btn:focus,
+.btn{
     border: none !important;
-    background-color: inherit;
+    /* background-color: inherit; */
 }
 
 
@@ -455,4 +460,16 @@ textarea:focus,
     .round-btn:hover{
         background-color: var(--white-color);
     }
+    .round-btn,
+    .round-btn:focus,
+    .btn:focus{
+        border: none !important;
+        background-color: inherit;
+    }
+  }
+
+  .event-table td,
+  .event-table th {
+      vertical-align: middle; /* Vertical alignment set to middle */
+      height: 60px;
   }
