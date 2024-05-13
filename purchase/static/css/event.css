@@ -32,7 +32,6 @@
 
 .bootstrap-select.update-form .dropdown-menu{
     min-width: 0px !important;
-    /* max-width: 300px !important; */
 }
 
 .bootstrap-select .btn:focus{
@@ -41,4 +40,8 @@
     box-shadow: none !important;
     border-bottom: 2px solid #e27f34 !important;
     outline: 0 !important;
+}
+
+.card{
+    min-height: 80vh;
 }

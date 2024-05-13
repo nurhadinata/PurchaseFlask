@@ -5,6 +5,7 @@ import json
 from flask import Flask
 
 from flask_sqlalchemy import SQLAlchemy
+from purchase.models import ResUserOdoo, ProductOdoo, PurchaseOrderOdoo, PurchaseOrderLineOdoo, NfcappFarmerOdoo, PurchaseEvent, Transaction
 from purchase.models import db
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
@@ -50,6 +51,78 @@ def create_app(test_config=None):
     @app.route("/") 
     def index(): 
         return render_template('main_menu.html')
+
+    @app.route('/selectpickerUser', methods=["GET"])
+    def selectpickerUser():
+        query = request.args.get('q')
+
+        user_list = ResUserOdoo.query.filter(ResUserOdoo.login.ilike(f'%{query}%')).all()
+
+        res_user = [{
+            "id": user.id,
+            "text": user.login,
+        } for user in user_list]
+
+        # res_users.append({
+        #     "id": "all",
+        #     "text": "All",
+        # })
+
+        return json.dumps(res_user)
+
+    @app.route('/selectpickerPo', methods=["GET"])
+    def selectpickerPo():
+        query = request.args.get('q')
+
+        po_list = PurchaseOrderOdoo.query.filter(PurchaseOrderOdoo.name.ilike(f'%{query}%')).order_by(PurchaseOrderOdoo.id.desc()).all()
+
+        res_po = [{
+            "id": po.id,
+            "text": po.name,
+        } for po in po_list]
+
+        # res_users.append({
+        #     "id": "all",
+        #     "text": "All",
+        # })
+
+        return json.dumps(res_po)
+
+    @app.route('/selectpickerPurchaseEvent', methods=["GET"])
+    def selectpickerPurchaseEvent():
+        query = request.args.get('q')
+
+        event_list = PurchaseEvent.query.filter(PurchaseEvent.name.ilike(f'%{query}%')).order_by(PurchaseEvent.id.desc()).all()
+
+        res_event = [{
+            "id": event.id,
+            "text": event.name,
+        } for event in event_list]
+
+        # res_users.append({
+        #     "id": "all",
+        #     "text": "All",
+        # })
+
+        return json.dumps(res_event)
+
+    @app.route('/selectpickerFarmer', methods=["GET"])
+    def selectpickerFarmer():
+        query = request.args.get('q')
+
+        farmer_list = NfcappFarmerOdoo.query.filter(NfcappFarmerOdoo.farmer_name.ilike(f'%{query}%')).order_by(NfcappFarmerOdoo.farmer_name).all()
+
+        res_farmer = [{
+            "id": farmer.id,
+            "text": farmer.farmer_name,
+        } for farmer in farmer_list]
+
+        # res_users.append({
+        #     "id": "all",
+        #     "text": "All",
+        # })
+
+        return json.dumps(res_farmer)
 
     # from . import db
     # db.init_app(app)

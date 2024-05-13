@@ -37,14 +37,14 @@ function testFunction(eventId){
 
 function updateEvent(eventId){
     var fund = document.getElementById("fund-update"+eventId).value
-    var cashier = document.getElementById("cashier-update"+eventId).value
-    var purchaser = document.getElementById("purchaser-update"+eventId).value
+    var cashier_id = document.getElementById("cashier-update"+eventId).value
+    var purchaser_id = document.getElementById("purchaser-update"+eventId).value
 
     var updatedData = {
         id: eventId, 
         fund: fund,
-        cashier: cashier,
-        purchaser: purchaser
+        cashier_id: cashier_id,
+        purchaser_id: purchaser_id
     };
     
     // Send POST request to update data
@@ -55,9 +55,11 @@ function updateEvent(eventId){
         data: JSON.stringify(updatedData),
         success: function(response) {
             // Request was successful, handle response here
-            document.getElementById("fund-info"+eventId).innerHTML = fund
-            document.getElementById("cashier-info"+eventId).innerHTML = cashier
-            document.getElementById("purchaser-info"+eventId).innerHTML = purchaser
+            document.getElementById("fund-info"+eventId).innerHTML = response.fund.toFixed(2)
+            document.getElementById("cashier-info"+eventId).innerHTML = response.cashier
+            document.getElementById("purchaser-info"+eventId).innerHTML = response.purchaser
+            document.getElementById("cashier-id"+eventId).innerHTML = cashier_id
+            document.getElementById("purchaser-id"+eventId).innerHTML = purchaser_id
             console.log(response.message);
         },
         error: function(xhr, status, error) {
@@ -74,11 +76,96 @@ function updateEvent(eventId){
 }
 
 function cancelUpdateEvent(eventId){
-    document.getElementById("fund-update"+eventId).value = document.getElementById("fund-info"+eventId).innerHTML.trim()
-    document.getElementById("cashier-update"+eventId).value = document.getElementById("cashier-info"+eventId).innerHTML.trim()
-    document.getElementById("purchaser-update"+eventId).value = document.getElementById("purchaser-info"+eventId).innerHTML.trim()
+    var cashier_select = document.getElementById("cashier-update"+eventId);
+    cashier_select.value = parseInt(document.getElementById("cashier-id"+eventId).innerHTML.trim())
 
+    var purchaser_select = document.getElementById("purchaser-update"+eventId);
+    purchaser_select.value = parseInt(document.getElementById("purchaser-id"+eventId).innerHTML.trim())
+
+    document.getElementById("fund-update"+eventId).value = document.getElementById("fund-info"+eventId).innerHTML.trim()
+
+    $(cashier_select).selectpicker('refresh')
+    $(purchaser_select).selectpicker('refresh')
+    
     testFunction(eventId)
+}
+
+function editTransaction(transactionId){
+
+    const tCol = document.querySelectorAll('.transaction-info'+transactionId)
+    
+    if(tCol){
+        tCol.forEach(l=> l.classList.toggle('hidden'))
+    }
+        // add padding to body
+}
+
+function updateTransaction(transactionId){
+    var purchase_order_id = document.getElementById("po-update"+transactionId).value
+    var purchase_event_id = document.getElementById("event-update"+transactionId).value
+    var farmer_id = document.getElementById("farmer-update"+transactionId).value
+    var price_unit = document.getElementById("price-update"+transactionId).value
+    var qty = document.getElementById("qty-update"+transactionId).value
+
+    var updatedData = {
+        id: transactionId, 
+        purchase_order_id: purchase_order_id,
+        purchase_event_id: purchase_event_id,
+        farmer_id: farmer_id,
+        price_unit: price_unit,
+        qty: qty
+    };
+    
+    // Send POST request to update data
+    $.ajax({
+        url: '/purchase/transaction/update',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(updatedData),
+        success: function(response) {
+            // Request was successful, handle response here
+            document.getElementById("po-info"+transactionId).innerHTML = response.po
+            document.getElementById("event-info"+transactionId).innerHTML = response.event
+            document.getElementById("farmer-info"+transactionId).innerHTML = response.farmer
+            document.getElementById("po-id"+transactionId).innerHTML = purchase_order_id
+            document.getElementById("event-id"+transactionId).innerHTML = purchase_event_id
+            document.getElementById("farmer-id"+transactionId).innerHTML = farmer_id
+            document.getElementById("price-info"+transactionId).innerHTML = response.price_unit.toFixed(2)
+            document.getElementById("qty-info"+transactionId).innerHTML = response.qty.toFixed(0)
+            document.getElementById("subtotal-info"+transactionId).innerHTML = response.subtotal.toFixed(2)
+            console.log(response.message);
+        },
+        error: function(xhr, status, error) {
+            // Request failed
+            console.error('Request failed: ' + error);
+        }
+    });
+
+    editTransaction(transactionId)
+
+
+    // console.log(fund)
+
+}
+
+function cancelUpdateTransaction(transactionId){
+    var po_select = document.getElementById("po-update"+transactionId);
+    po_select.value = parseInt(document.getElementById("po-id"+transactionId).innerHTML.trim())
+    
+    var event_select = document.getElementById("event-update"+transactionId)
+    event_select.value = parseInt(document.getElementById("event-id"+transactionId).innerHTML.trim())
+    
+    var farmer_select = document.getElementById("farmer-update"+transactionId)
+    farmer_select.value = parseInt(document.getElementById("farmer-id"+transactionId).innerHTML.trim())
+
+    document.getElementById("price-update"+transactionId).value = parseFloat(document.getElementById("price-info"+transactionId).innerHTML.trim()).toFixed(2)
+    document.getElementById("qty-update"+transactionId).value = parseFloat(document.getElementById("qty-info"+transactionId).innerHTML.trim()).toFixed(0)
+    
+    $(po_select).selectpicker('refresh')
+    $(event_select).selectpicker('refresh')
+    $(farmer_select).selectpicker('refresh')
+
+    editTransaction(transactionId)
 }
 
 
@@ -169,7 +256,66 @@ document.addEventListener("DOMContentLoaded", function(event) {
     });
 
     $(document).ready(function() {
-        $('.selectpicker').selectpicker();
+        
+            $('.selectpicker').selectpicker();
+
+            // select all selectpicker that contains class populateJSON and initialize selectpicker
+            var selectElements = $('.populateJSON').selectpicker();
+
+            // Attach the event handler to the 'changed.bs.select' event for select elements with the 'selectpicker' class
+            selectElements.on('shown.bs.select', function(e) {
+                var selector = $(this);
+                var parentClassName = selector.attr('class').split(' ');
+                var dataNameJSONClass = parentClassName[parentClassName.length - 1];
+                var firstPrevSelect = selector.find('option:selected').prop('outerHTML');
+
+                // Find the search input within the Bootstrap Select dropdown relative to the current select element
+                var searchBoxElement = $(this).parent().find('.bs-searchbox > input');
+
+                // set typing timeout and minLength character in input
+                var timeout = null;
+                var typingTime = 250; // milliseconds
+                var minLength = 1;
+                var previousInput = ' ';
+                                    // when user type in selectpicker searchbox
+                searchBoxElement.keyup(function(event) {
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => {
+                        var inputValue = $(this).val().trim();
+                        if (inputValue.length >= minLength == previousInput !== inputValue) {
+                            previousInput = inputValue;
+                            $.ajax({
+                                url: '/' + dataNameJSONClass, // e.g. 'get_data_products'
+                                method: 'GET',
+                                dataType: 'json',
+                                async: true,
+                                cache: {
+                                    expires: 60000 // 60 second cache
+                                },
+                                data: { q: inputValue , user_id: $('#user_filter_form').val()},
+                                success: function(response) {
+                                    const optionsHTML = response.map(
+                                        ({ id, text }) => `<option value="${id}">${text}</option>`
+                                    ).join('');
+                                    selector.empty();
+                                    selector.append(firstPrevSelect);
+                                    if (dataNameJSONClass === 'get_data_picking_type' || dataNameJSONClass === 'get_data_out_location') {
+                                        selector.append(`<option value="none" data-subtext="Delete"><span>None</span></option>`);
+                                    };
+                                    selector.append(`<option data-divider="true"/>`);
+                                    selector.append(optionsHTML);
+                                    selector.selectpicker('refresh');
+                                    selector.selectpicker('refresh'); // twice
+                                },
+                                error: function(xhr, status, error) {
+                                    console.error('Error fetching options:', error);
+                                }
+                            });
+                        }
+                    }, typingTime);
+                });
+            });
+        
         
         const linkColor = document.querySelectorAll('.nav_link')
         
@@ -191,6 +337,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
             }else if(selectedMenu=="report"){
                 linkColor.forEach(l=> l.classList.remove('active'))
                 var selectedNav = document.getElementById('nav_purchase_report')
+                selectedNav.classList.add('active');
+            }else if(selectedMenu=="event"){
+                linkColor.forEach(l=> l.classList.remove('active'))
+                var selectedNav = document.getElementById('nav_purchase_event')
+                selectedNav.classList.add('active');
+            }else if(selectedMenu=="transaction"){
+                linkColor.forEach(l=> l.classList.remove('active'))
+                var selectedNav = document.getElementById('nav_transaction')
                 selectedNav.classList.add('active');
             }
         }

@@ -21,12 +21,14 @@ from purchase.config import ODOO_URL, ODOO_DB, ODOO_PASSWORD, ODOO_USERNAME
 # username = 'cerdas@tripper.com'
 # password = 'Cerdas@2024'
 
-common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
-uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
-models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
+    
+
 
 @bp.route('/sync_with_odoo')
 def sync_with_odoo():
+    common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
 
     # Call the method exposed in Odoo
     data = models.execute_kw(ODOO_DB, uid, ODOO_PASSWORD, 'external.service', 'get_data', ["res_users"])
@@ -216,6 +218,9 @@ def sync_with_odoo():
 
 @bp.route('/sync_res_user')
 def sync_res_user():
+    common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
 
     # Call the method exposed in Odoo
     data = models.execute_kw(ODOO_DB, uid, ODOO_PASSWORD, 'external.service', 'get_data', ["res_users"])
@@ -253,6 +258,9 @@ def sync_res_user():
 
 @bp.route('/migrate_res_user')
 def migrate_res_user():
+    common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
 
     # Call the method exposed in Odoo
     odoo_data = models.execute_kw(ODOO_DB, uid, ODOO_PASSWORD, 'external.service', 'get_data', ["res_users"])
@@ -303,6 +311,9 @@ def migrate_res_user():
 
 @bp.route('/sync_product_odoo')
 def sync_product_odoo():
+    common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
 
     # Call the method exposed in Odoo
     odoo_table = "product_product"
@@ -342,6 +353,9 @@ def sync_product_odoo():
 
 @bp.route('/sync_purchase_order_odoo')
 def sync_purchase_order_odoo():
+    common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
 
     # Call the method exposed in Odoo
     odoo_table = "purchase_order"
@@ -381,6 +395,9 @@ def sync_purchase_order_odoo():
 
 @bp.route('/sync_purchase_order_line_odoo')
 def sync_purchase_order_line_odoo():
+    common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
 
     # Call the method exposed in Odoo
     odoo_table = "purchase_order_line"
@@ -420,6 +437,9 @@ def sync_purchase_order_line_odoo():
 
 @bp.route('/sync_farmer_odoo')
 def sync_farmer_odoo():
+    common = xmlrpc.client.ServerProxy('{}/xmlrpc/2/common'.format(ODOO_URL))
+    uid = common.authenticate(ODOO_DB, ODOO_USERNAME, ODOO_PASSWORD, {})
+    models = xmlrpc.client.ServerProxy('{}/xmlrpc/2/object'.format(ODOO_URL))
 
     # Call the method exposed in Odoo
     odoo_table = "nfcapp_farmer"
@@ -463,3 +483,4 @@ def normalize_value(value):
     elif isinstance(value, datetime.datetime):
         return value.strftime('%Y-%m-%d %H:%M:%S')
     return value
+

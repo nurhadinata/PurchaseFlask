@@ -218,16 +218,18 @@ class PurchaseEvent(db.Model):
     name = db.Column(db.String)
     fund = db.Column(db.Float, default=100000)
     ics = db.Column(db.String)
-    purchaser = db.Column(db.Integer, db.ForeignKey('res_user_odoo.id'))
-    cashier = db.Column(db.Integer, db.ForeignKey('res_user_odoo.id'))
+    purchaser_id = db.Column(db.Integer, db.ForeignKey('res_user_odoo.id'))
+    purchaser = db.relationship('ResUserOdoo', foreign_keys=[purchaser_id], backref=db.backref('purchaser_events', lazy=True))
+    cashier_id = db.Column(db.Integer, db.ForeignKey('res_user_odoo.id'))
+    cashier = db.relationship('ResUserOdoo', foreign_keys=[cashier_id], backref=db.backref('cashier_events', lazy=True))
     ap_name = db.Column(db.String)
     ip_address = db.Column(db.String)
     created_at = db.Column(db.DateTime, nullable=False)
 
-    def __init__(self, fund, purchaser, cashier):
+    def __init__(self, fund, purchaser_id, cashier_id):
         self.fund = fund
-        self.purchaser = purchaser
-        self.cashier = cashier
+        self.purchaser_id = purchaser_id
+        self.cashier_id = cashier_id
         self.ip_address = request.remote_addr
         self.created_at = datetime.utcnow()
         self.generate_name()
@@ -242,6 +244,34 @@ class PurchaseEvent(db.Model):
 
     def __repr__(self):
         return f'<PurchaseEvent {self.purchase_event}>'
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    purchase_order_id = db.Column(db.Integer, db.ForeignKey('purchase_order_odoo.id'))
+    purchase_order = db.relationship('PurchaseOrderOdoo', foreign_keys=[purchase_order_id], backref=db.backref('transactions', lazy=True))
+    station = db.Column(db.String, default="default")
+    purchase_event_id = db.Column(db.Integer, db.ForeignKey('purchase_event.id'))
+    purchase_event = db.relationship('PurchaseEvent', foreign_keys=[purchase_event_id], backref=db.backref('transactions', lazy=True))
+    farmer_id = db.Column(db.Integer, db.ForeignKey('nfcapp_farmer_odoo.id'))
+    farmer = db.relationship('NfcappFarmerOdoo', foreign_keys=[farmer_id], backref=db.backref('transactions', lazy=True))
+    # item_code_id = db.Column(db.Integer, db.ForeignKey('product_odoo.id'))
+    # item_code = db.Column(db.Integer, db.ForeignKey('product_odoo.id'))
+    price_unit = db.Column(db.Float, default=100000)
+    qty = db.Column(db.Float, default=100)
+    subtotal = db.Column(db.Float)
+
+    def __init__(self, purchase_order_id, purchase_event_id, farmer_id, price_unit, qty):
+        self.purchase_order_id = purchase_order_id
+        self.purchase_event_id = purchase_event_id
+        self.farmer_id = farmer_id
+        self.price_unit = price_unit
+        self.qty =  qty
+        self.subtotal = price_unit * qty
+
+    def __repr__(self):
+        return f'<Transaction {self.id}>'
+
+
 
 
 
