@@ -6,6 +6,7 @@ db = SQLAlchemy()
 session = db.session
 
 class User2(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -14,6 +15,7 @@ class User2(db.Model):
         return '<User %r>' % self.username
 
 class ProductOdoo(db.Model):
+    __tablename__ = 'product_odoo'
     id = db.Column(db.Integer, primary_key=True)
     default_code = db.Column(db.String)
     active = db.Column(db.Boolean)
@@ -58,6 +60,7 @@ class ProductOdoo(db.Model):
         return f'<ProductOdoo {self.default_code}>'
 
 class NfcappFarmerOdoo(db.Model):
+    __tablename__ = 'nfcapp_farmer_odoo'
     id = db.Column(db.Integer, primary_key=True)
     parent_id = db.Column(db.Integer)
     code = db.Column(db.String)
@@ -98,6 +101,7 @@ class NfcappFarmerOdoo(db.Model):
         return f'<Farmer {self.farmer_name}>'
 
 class PurchaseOrderOdoo(db.Model):
+    __tablename__ = 'purchase_order_odoo'
     id = db.Column(db.Integer, primary_key=True)
     message_main_attachment_id = db.Column(db.Integer)
     access_token = db.Column(db.String)
@@ -140,6 +144,7 @@ class PurchaseOrderOdoo(db.Model):
         return f'<PurchaseOrderOdoo {self.name}>'
 
 class PurchaseOrderLineOdoo(db.Model):
+    __tablename__ = 'purchase_order_line_odoo'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.Text)
     sequence = db.Column(db.Integer)
@@ -180,6 +185,7 @@ class PurchaseOrderLineOdoo(db.Model):
         return f'<PurchaseOrderLineOdoo {self.name}>'
 
 class ResUserOdoo(db.Model):
+    __tablename__ = 'res_user_odoo'
     id = db.Column(db.Integer, primary_key=True)
     active = db.Column(db.Boolean, default=True)
     login = db.Column(db.String)
@@ -214,6 +220,7 @@ class ResUserOdoo(db.Model):
 
 
 class PurchaseEvent(db.Model):
+    __tablename__ = 'purchase_event'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String)
     fund = db.Column(db.Float, default=100000)
@@ -223,6 +230,7 @@ class PurchaseEvent(db.Model):
     ap_name = db.Column(db.String)
     ip_address = db.Column(db.String)
     created_at = db.Column(db.DateTime, nullable=False)
+    purchase_order_odoo_id = db.Column(db.Integer, db.ForeignKey('purchase_order_odoo.id'))
 
     def __init__(self, fund, purchaser, cashier):
         self.fund = fund
@@ -244,15 +252,24 @@ class PurchaseEvent(db.Model):
         return f'<PurchaseEvent {self.purchase_event}>'
 
 
-class NfcappFarmer(db.Model):
+class Farmer(db.Model):
+    __tablename__ = 'farmer'
     id = db.Column(db.Integer, primary_key=True)
-    farmer_name = db.Column(db.String)
-    product_ids = db.relationship("Product", back_populates='farmer_id', lazy='dynamic')
-    farmer_code = db.Column(db.string)
+    farmer_name = db.Column(db.String(128))
+    farmer_code = db.Column(db.String(64))
+    products = db.relationship('Product', back_populates='farmer', lazy='dynamic')
 
-class Product(db.Model) :
+class Product(db.Model):
+    __tablename__ = 'product'
     id = db.Column(db.Integer, primary_key=True)
-    product_code = db.Column(db.String)
+    product_code = db.Column(db.String(64))
+    product_name = db.Column(db.String(128))
+    farmer_id = db.Column(db.Integer, db.ForeignKey('farmer.id'))
+    farmer = db.relationship('Farmer', back_populates='products')
+    product_odoo_id = db.Column(db.Integer, db.ForeignKey('product_odoo.id'))
+
+
+
 
 
 
