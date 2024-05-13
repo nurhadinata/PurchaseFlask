@@ -3,13 +3,14 @@ import click
 import json
 
 from flask import Flask
-
+from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 from purchase.models import db
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, session, url_for
 )
 
+migrate = None
 
 def create_app(test_config=None):
     # create and configure the app
@@ -28,6 +29,8 @@ def create_app(test_config=None):
 
     # Initialize SQLAlchemy
     db.init_app(app)
+    global migrate
+    migrate = Migrate(app, db)
 
     
     # Create tables

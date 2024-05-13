@@ -1,6 +1,7 @@
 from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
+from . import models_custom
 
 db = SQLAlchemy()
 session = db.session
@@ -219,6 +220,23 @@ class ResUserOdoo(db.Model):
     # )
 
 
+class Farmer(db.Model):
+    __tablename__ = 'farmer'
+    id = db.Column(db.Integer, primary_key=True)
+    farmer_name = db.Column(db.String(128))
+    farmer_code = db.Column(db.String(64))
+    products = db.relationship('Product', backref='farmer', lazy='dynamic')
+
+class Product(db.Model):
+    __tablename__ = 'product'
+    id = db.Column(db.Integer, primary_key=True)
+    product_code = db.Column(db.String(64))
+    product_name = db.Column(db.String(128))
+    farmer_id = db.Column(db.Integer, db.ForeignKey('farmer.id'))
+    # farmer = db.relationship('Farmer', back_populates='products')
+    product_odoo_id = db.Column(db.Integer, db.ForeignKey('product_odoo.id'))
+
+
 class PurchaseEvent(db.Model):
     __tablename__ = 'purchase_event'
     id = db.Column(db.Integer, primary_key=True)
@@ -231,6 +249,8 @@ class PurchaseEvent(db.Model):
     ip_address = db.Column(db.String)
     created_at = db.Column(db.DateTime, nullable=False)
     purchase_order_odoo_id = db.Column(db.Integer, db.ForeignKey('purchase_order_odoo.id'))
+    purchase_orders = db.relationship('purchase_order', backref='purchase_event')
+    payments = db.relationship('payment', backref='purchase_event')
 
     def __init__(self, fund, purchaser, cashier):
         self.fund = fund
@@ -251,22 +271,50 @@ class PurchaseEvent(db.Model):
     def __repr__(self):
         return f'<PurchaseEvent {self.purchase_event}>'
 
-
-class Farmer(db.Model):
-    __tablename__ = 'farmer'
+class PurchaseOrder(db.Model):
+    __tablename__ = 'purchase_order'
     id = db.Column(db.Integer, primary_key=True)
-    farmer_name = db.Column(db.String(128))
-    farmer_code = db.Column(db.String(64))
-    products = db.relationship('Product', back_populates='farmer', lazy='dynamic')
-
-class Product(db.Model):
-    __tablename__ = 'product'
-    id = db.Column(db.Integer, primary_key=True)
-    product_code = db.Column(db.String(64))
-    product_name = db.Column(db.String(128))
+    receipt_number = db.Column(db.String(64))
+    purchase_order_lines = db.relationship('purchase_order_line', backref='purchase_order', lazy='dynamic')
     farmer_id = db.Column(db.Integer, db.ForeignKey('farmer.id'))
-    farmer = db.relationship('Farmer', back_populates='products')
+    payment_id = db.Column(db.Integer, db.ForeignKey('payment.id'))
+    status = db.Column(db.String(64))
+    purchase_event_id = db.Column(db.Integer, db.ForeignKey('purchase_event.id'))
+
+
+class PurchaseOrderLine(db.Model):
+    __tablename__ = 'purchase_order_line'
+    id = db.Column(db.Integer, primary_key=True)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id'))
     product_odoo_id = db.Column(db.Integer, db.ForeignKey('product_odoo.id'))
+    qty = db.Column(db.Float)
+    unit_price = db.Column(db.Float)
+    barcode = db.Column(db.String)
+    subtotal = db.Column(db.Float)
+    currency = db.Column(db.String)
+    delivery_order_id = db.Column(db.Integer, db.ForeignKey('delivery_order.id'))
+    purchase_order_id = db.Column(db.Integer, db.ForeignKey('purchase_order.id'))
+
+class Payment(db.Model):
+    __tablename__ = 'payment'
+    id = db.Column(db.Integer, primary_key=True)
+    purchase_order_id = db.Column(db.Integer, db.ForeignKey('purchase_order.id'))
+    debit = db.Column(db.Float)
+    credit = db.Column(db.Float)
+    # purchase_event_id = db.Column(db.Integer, db.ForeignKey('purchase_event.id'))
+    note = db.Column(db.String)
+    purchase_event_id = db.Column(db.Integer, db.ForeignKey('purchase_event.id'))
+
+class DeliveryOrder(db.Model):
+    __tablename__ = 'delivery_order'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String)
+    driver = db.Column(db.String)
+    vehicle_number = db.Column(db.String)
+    purchase_event_id = db.Column(db.Integer, db.ForeignKey('purchase_event.id'))
+    purchase_order_lines = db.relationship('purchase_order_line', back_populates='delivery_order', lazy='dynamic')
+
+
 
 
 
