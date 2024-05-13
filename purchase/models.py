@@ -244,6 +244,22 @@ class PurchaseEvent(db.Model):
         return f'<PurchaseEvent {self.purchase_event}>'
 
 
+class NfcappFarmer(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    farmer_name = db.Column(db.String)
+    product_ids = db.relationship("Product", back_populates='farmer_id', lazy='dynamic')
+    farmer_code = db.Column(db.string)
+
+class Product(db.Model) :
+    id = db.Column(db.Integer, primary_key=True)
+    product_code = db.Column(db.String)
+
+
+
+
+
+
+
 
 
 

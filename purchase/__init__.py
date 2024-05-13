@@ -19,7 +19,7 @@ def create_app(test_config=None):
     #     SECRET_KEY='dev',
     #     DATABASE=os.path.join(app.instance_path, 'purchase.sqlite'),
     # )
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://myodoo:12345678@localhost/flask_test'
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://purchase:root@localhost:5432/purchase'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 
@@ -61,11 +61,11 @@ def create_app(test_config=None):
 
     from . import auth
     app.register_blueprint(auth.bp)
-
+    #
     from . import purchase
     app.register_blueprint(purchase.bp)
-
-    from . import migration
-    app.register_blueprint(migration.bp)
+    #
+    # from . import migration
+    # app.register_blueprint(migration.bp)
 
     return app
