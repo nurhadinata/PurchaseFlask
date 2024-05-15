@@ -26,9 +26,14 @@ def farmer_list():
 
 @bp.route('/event', methods=["GET"])
 def event_list():
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
+    pagination = PurchaseEvent.query.order_by(PurchaseEvent.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    events = pagination.items
+    total_pages = pagination.pages
     users = ResUserOdoo.query.all()
-    events = PurchaseEvent.query.order_by(PurchaseEvent.id).all()
-    return render_template('purchase/event.html', events=events, users=users)
+    # events = PurchaseEvent.query.order_by(PurchaseEvent.id).all()
+    return render_template('purchase/event.html', events=events, users=users, page=page, total_pages=total_pages)
 
 @bp.route('/event/add', methods=["POST"])
 def event_add():
@@ -66,11 +71,16 @@ def event_update():
 
 @bp.route('/transaction', methods=["GET"])
 def transaction_list():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    pagination = Transaction.query.order_by(Transaction.id.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    transaction_list = pagination.items
+    total_pages = pagination.pages
     po_list = PurchaseOrderOdoo.query.order_by(PurchaseOrderOdoo.id.desc()).all()
     event_list = PurchaseEvent.query.order_by(PurchaseEvent.id.desc()).all()
     farmer_list = NfcappFarmerOdoo.query.order_by(NfcappFarmerOdoo.farmer_name.asc()).all()
-    transaction_list = Transaction.query.order_by(Transaction.id.desc()).all()
-    return render_template('purchase/transaction.html', po_list=po_list, event_list=event_list, farmer_list=farmer_list, transaction_list=transaction_list)
+    # transaction_list = Transaction.query.order_by(Transaction.id.desc()).all()
+    return render_template('purchase/transaction.html', po_list=po_list, event_list=event_list, farmer_list=farmer_list, transaction_list=transaction_list, page=page, total_pages=total_pages)
 
 @bp.route('/transaction/add', methods=["POST"])
 def transaction_add():
@@ -119,6 +129,29 @@ def transaction_update():
                         })
     else:
         return jsonify({'message': 'Transaction not found'}), 404
+
+@bp.route('/receipt', methods=["GET"])
+def receipt_form():
+    po_id = request.args.get('po', 1, type=int)
+    purchase_order = PurchaseOrderOdoo.query.get(po_id)
+    transaction_list = Transaction.query.filter_by(purchase_order_id=po_id).all()
+    # transaction_list = Transaction.query.order_by(Transaction.id.desc()).all()
+    return render_template('purchase/receipt_form.html', purchase_order = purchase_order, transaction_list = transaction_list)
+
+@bp.route('/cashier', methods=["GET"])
+def cashier_form():
+    po_id = request.args.get('po', 1, type=int)
+    purchase_order = PurchaseOrderOdoo.query.get(po_id)
+    transaction_list = Transaction.query.filter_by(purchase_order_id=po_id).all()
+    total_payment = 0.00
+    for transaction in transaction_list:
+        total_payment+=transaction.subtotal
+    
+    status = "Not Paid"
+
+    # transaction_list = Transaction.query.order_by(Transaction.id.desc()).all()
+    return render_template('purchase/cashier_form.html', purchase_order = purchase_order, transaction_list = transaction_list, total_payment= total_payment, status=status)
+    
 
 
     

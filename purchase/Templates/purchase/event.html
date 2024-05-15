@@ -179,6 +179,10 @@
                     </tr>
                 {% endfor %}
             </table>
+            <span id="pagination-link" class="hidden">/purchase/event?page=</span>
+            <span id="current-page" class="hidden">{{page}}</span>
+            <span id="total-page" class="hidden">{{total_pages}}</span>
+            <div id="pagination"  style="width:100%; display:flex; justify-content: center;"></div>
         </div>
     </div>
         
@@ -190,6 +194,7 @@
 
 {% endblock %}
 {% block script_plugin %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/event.css') }}">
 <!-- Bootstrap CSS -->
 <!-- <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" rel="stylesheet"> -->
 

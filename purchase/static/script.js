@@ -168,6 +168,17 @@ function cancelUpdateTransaction(transactionId){
     editTransaction(transactionId)
 }
 
+function getPO(){
+    var po = $('#purchase-order').val();
+    var relativeURL = '/purchase/cashier' +
+                        '?po=' + po;
+    // Use window.open to open the new page
+    window.location.href = location.origin + relativeURL;
+
+}
+
+
+
 
 
 
@@ -185,6 +196,8 @@ if(selectedMenu=="farmer-list"){
         })
     }
 }
+
+
 
 window.addEventListener('click', function(event) {
     const showNavbar2 = (toggleId, navId, bodyId, headerId) =>{
@@ -214,6 +227,105 @@ window.addEventListener('click', function(event) {
   });
 
 document.addEventListener("DOMContentLoaded", function(event) {
+
+    function createPagination(totalPages, currentPage, pageLink) {
+        let paginationHTML = '<ul class="pagination">';
+        const delta = 2;
+        const left = currentPage - delta;
+        const right = currentPage + delta + 1;
+        const range = [];
+        const rangeWithDots = [];
+        let l;
+
+        for (let i = 1; i <= totalPages; i++) {
+            if(currentPage<6){
+                if (i < 8 || i === totalPages || (i >= left && i < right)) {
+                    range.push(i);
+                }
+            }else if(totalPages-currentPage<5){
+                if (i === 1 || i > totalPages-7 || (i >= left && i < right)) {
+                    range.push(i);
+                }
+            }else{
+                if (i === 1 || i === totalPages || (i >= left && i < right)) {
+                    range.push(i);
+                }
+            }
+            // if (i === 1 || i === totalPages || (i >= left && i < right)) {
+            //     range.push(i);
+            // }
+        }
+
+        for (let i of range) {
+            if (l) {
+                if (i - l === 2) {
+                    rangeWithDots.push(l + 1);
+                } else if (i - l !== 1) {
+                    rangeWithDots.push('...');
+                }
+            }
+            rangeWithDots.push(i);
+            l = i;
+        }
+
+        if(currentPage!=1){
+            paginationHTML += `<li><a href="${pageLink}${currentPage-1}"><i class='bx bx-chevron-left'></i></a></li>`;
+        }
+
+        rangeWithDots.forEach(page => {
+            if (page === '...') {
+                paginationHTML += `<li><a class="disabled">...</a></li>`;
+            } else {
+                paginationHTML += `<li><a class="${page === currentPage ? 'active' : ''}" href="${pageLink}${page}">${page}</a></li>`;
+            }
+        });
+
+        if(currentPage!=totalPages){
+            paginationHTML += `<li><a href="${pageLink}${currentPage+1}"><i class='bx bx-chevron-right'></i></a></li>`;
+        }
+
+        paginationHTML += '</ul>';
+        return paginationHTML;
+    }
+
+    const paginationContainer = document.getElementById('pagination');
+    if(paginationContainer){
+        const totalPages = parseInt(document.getElementById('total-page').innerHTML.trim());
+        const currentPage = parseInt(document.getElementById('current-page').innerHTML.trim());
+        const pageLink = document.getElementById('pagination-link').innerHTML.trim();
+        paginationContainer.innerHTML = createPagination(totalPages, currentPage, pageLink);
+    }
+
+    console.log(sessionStorage.getItem('fullscreen'))
+
+
+    document.getElementById('fullscreenButton').addEventListener('click', function() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            if (document.exitFullscreen) {
+                document.exitFullscreen();
+            }
+        }
+        sessionStorage.setItem('fullscreen', !document.fullscreenElement ? 'true' : 'false');
+        console.log(sessionStorage.getItem('fullscreen'))
+        console.log(document.fullscreenElement)
+    });
+
+    document.getElementById('reloadButton').addEventListener('click', function() {
+        location.reload();
+    });
+
+    
+
+    // Add event listener for pagination clicks (optional)
+    // paginationContainer.addEventListener('click', (e) => {
+    //     if (e.target.tagName === 'A' && !e.target.classList.contains('disabled') && !e.target.classList.contains('active')) {
+    //         e.preventDefault();
+    //         const newPage = parseInt(e.target.textContent);
+    //         paginationContainer.innerHTML = createPagination(totalPages, newPage);
+    //     }
+    // });
    
     const showNavbar = (toggleId, navId, bodyId, headerId) =>{
     const toggle = document.getElementById(toggleId),
@@ -275,7 +387,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                 // set typing timeout and minLength character in input
                 var timeout = null;
                 var typingTime = 250; // milliseconds
-                var minLength = 1;
+                var minLength = 0;
                 var previousInput = ' ';
                                     // when user type in selectpicker searchbox
                 searchBoxElement.keyup(function(event) {
@@ -315,7 +427,6 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     }, typingTime);
                 });
             });
-        
         
         const linkColor = document.querySelectorAll('.nav_link')
         
