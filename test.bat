@@ -1,9 +1,3 @@
-where "bash.exe" >nul 2>&1
-IF %ERRORLEVEL% EQU 0 (
-    set "GIT_BASH_PATH=bash.exe"
-    echo Running the script using Git Bash...
-    "%GIT_BASH_PATH%" --login -i "C:\Scripts\script.sh"
-    echo Script executed.
-) ELSE (
-    echo Git Bash executable not found.
-)
+set "GIT_BASH_PATH=C:\Program Files\Git\bin\bash.exe"
+set "SCRIPT_PATH=C:\path\to\your\script.sh"  REM Modify this line with your actual script path
+start "" "%GIT_BASH_PATH%" "%SCRIPT_PATH%"
