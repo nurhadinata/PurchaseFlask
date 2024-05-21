@@ -75,6 +75,7 @@ install_package_manager(){
             powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
 			echo 'export PATH="$PATH:/c/ProgramData/chocolatey/bin"'>>~/.bashrc
 			source ~/.bashrc
+			
 		fi
     fi
 }
@@ -94,7 +95,12 @@ install_postgresql(){
         choco upgrade chocolatey -y
 
         # Install PostgreSQL using Chocolatey
-        choco install postgresql12 -y
+        choco install postgresql12 --params '/Password:$PG_PASSWORD' -y
+		
+		echo 'export PATH="$PATH:/c/Program Files/PostgreSQL/12/bin"'>>~/.bashrc
+		source ~/.bashrc
+		
+		
     fi
 }
 
@@ -104,12 +110,12 @@ install_pyenv(){
         brew install pyenv
     elif [ "$OS" = "Windows" ]; then
         choco install pyenv-win -y
+		
+		echo 'export PYENV_ROOT="$HOME/.pyenv"'>>~/.bashrc
+		echo 'export PATH="$PYENV_ROOT/bin:$PATH"'>>~/.bashrc
+		echo 'eval "$(pyenv init --path)"'>>~/.bashrc
 
-	echo 'export PYENV_ROOT="$HOME/.pyenv"'>>~/.bashrc
-	echo 'export PATH="$PYENV_ROOT/bin:$PATH"'>>~/.bashrc
-	echo 'eval "$(pyenv init --path)"'>>~/.bashrc
-
- 	source ~/.bashrc
+		source ~/.bashrc
     fi
 }
 
