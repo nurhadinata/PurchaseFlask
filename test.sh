@@ -104,6 +104,12 @@ install_pyenv(){
         brew install pyenv
     elif [ "$OS" = "Windows" ]; then
         choco install pyenv-win -y
+
+	echo 'export PYENV_ROOT="$HOME/.pyenv"'>>~/.bashrc
+	echo 'export PATH="$PYENV_ROOT/bin:$PATH"'>>~/.bashrc
+	echo 'eval "$(pyenv init --path)"'>>~/.bashrc
+
+ 	source ~/.bashrc
     fi
 }
 
