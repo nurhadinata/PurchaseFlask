@@ -1,0 +1,2 @@
+WARNING: You did not specify a password for the postgres user so an insecure one has been generated for you. Please change it immediately.
+WARNING: Generated password:
