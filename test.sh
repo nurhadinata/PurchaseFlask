@@ -73,7 +73,9 @@ install_package_manager(){
         if ! command -v choco &>/dev/null; then
             echo "Chocolatey is not installed. Installing Chocolatey..."
             powershell -Command "Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))"
-        fi
+			echo 'export PATH="$PATH:/c/ProgramData/chocolatey/bin"'>>~/.bashrc
+			source ~/.bashrc
+		fi
     fi
 }
 
@@ -233,11 +235,3 @@ echo "Dependencies has been successfully installed."
 # export FLASK_DEBUG=1
 
 # venv/bin/flask run
-
-
-
-
-
-
-
-
