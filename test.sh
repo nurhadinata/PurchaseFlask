@@ -7,8 +7,8 @@ PG_USER="postgres"
 PG_PASSWORD="12345678"
 
 REPO_URL="https://github.com/alamkamajana/purchaseApp.git"
-DESTINATION_DIR="flaskAppCahya"
-BRANCH_NAME="cahya"
+DESTINATION_DIR="flaskApp"
+BRANCH_NAME="development"
 
 
 check_os() {
@@ -90,12 +90,19 @@ install_postgresql(){
 
         # Start PostgreSQL 12 service
         brew services start postgresql@12 
+		
+	echo 'export PATH="$PATH:/Library/PostgreSQL/12/bin"'>>~/.zshrc
+
+ 	echo "ALTER USER postgres WITH PASSWORD '$PG_PASSWORD';" | sudo -u postgres psql
+
+  	brew services restart postgresql@12
+		
     elif [ "$OS" = "Windows" ]; then
         # Update Chocolatey
         choco upgrade chocolatey -y
 
         # Install PostgreSQL using Chocolatey
-        choco install postgresql12 --params '/Password:$PG_PASSWORD' -y
+        choco install postgresql12 --params '/Password:"12345678"' -y
 		
 		echo 'export PATH="$PATH:/c/Program Files/PostgreSQL/12/bin"'>>~/.bashrc
 		source ~/.bashrc
@@ -108,12 +115,18 @@ install_pyenv(){
     local OS=$1
     if [ "$OS" = "macOS" ]; then
         brew install pyenv
+		
+		echo 'if command -v pyenv 1>/dev/null 2>&1; then' >> ~/.zshrc
+		echo '	eval "$(pyenv init --path)"' >> ~/.zshrc
+		echo 'fi' >> ~/.zshrc
+		
+		source ~/.zshrc
     elif [ "$OS" = "Windows" ]; then
         choco install pyenv-win -y
 		
 		echo 'export PYENV_ROOT="$HOME/.pyenv"'>>~/.bashrc
 		echo 'export PATH="$PYENV_ROOT/bin:$PATH"'>>~/.bashrc
-		echo -e 'if command -v pyenv 1>/dev/null 2>&1; then\n eval "$(pyenv init -)"\nfi' >> ~/.bash_profile
+		echo 'eval "$(pyenv init --path)"'>>~/.bashrc
 
 		source ~/.bashrc
     fi
@@ -123,8 +136,6 @@ install_git(){
     local OS=$1
     if [ "$OS" = "macOS" ]; then
         brew install git
-    elif [ "$OS" = "Windows" ]; then
-        choco install git -y
     fi
 }
 
@@ -189,14 +200,10 @@ else
     install_pyenv "$OS_NAME"
 
     # Add pyenv to PATH
-    echo 'export PATH="$HOME/.pyenv/bin:$PATH"' >> ~/.bash_profile
-    echo 'eval "$(pyenv init --path)"' >> ~/.bash_profile
-    echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bash_profile
-
-    # Initialize pyenv in the current shell
-    export PATH="$HOME/.pyenv/bin:$PATH"
-    eval "$(pyenv init --path)"
-    eval "$(pyenv virtualenv-init -)"
+    echo 'export PYENV_ROOT="$HOME/.pyenv"'>>~/.profile
+	echo 'export PATH="$PYENV_ROOT/bin:$PATH"'>>~/.profile
+	echo 'eval "$(pyenv init --path)"'>>~/.profile
+	source ~/.profile
 
     echo "pyenv has been successfully installed."
 fi
@@ -217,10 +224,14 @@ fi
 
 # Install Python 3.10 using pyenv
 echo "Installing Python 3.10..."
-pyenv install 3.10
+pyenv install 3.10.5
+
 
 # Set Python 3.10 as the global version
-pyenv global 3.10
+pyenv global 3.10.5
+
+echo 'alias python="$HOME/.pyenv/pyenv-win/versions/3.10.5/python3.exe"'>>~/.bashrc
+source ~/.bashrc
 
 echo "Python 3.10 has been successfully installed."
 
@@ -231,19 +242,43 @@ if [ -d "venv" ]; then
     rm -rf "venv"
 fi
 
-echo "Creating virtual environment..."
-python3 -m venv venv
+
+if [ "$OS_NAME" = "macOS" ]; then
+    echo "Creating virtual environment..."
+	pip install virtualenv
+
+	virtualenv venv
 
 
-source venv/bin/activate
-echo "Virtual Environment has been successfully created."
+	source venv/bin/activate
+	echo "Virtual Environment has been successfully created."
 
-echo "Installing dependencies..."
-pip3 install -r data/requirements.txt
-echo "Dependencies has been successfully installed."
+	echo "Installing dependencies..."
+	pip3 install -r data/requirements.txt
+	echo "Dependencies has been successfully installed."
 
-# export THONUNBUFFERED=1
-# export FLASK_APP=run.py
-# export FLASK_DEBUG=1
+	export THONUNBUFFERED=1
+	export FLASK_APP=run.py
+	export FLASK_DEBUG=1
 
-# venv/bin/flask run
+	venv/bin/flask run
+elif [ "$OS_NAME" = "Windows" ]; then
+    echo "Creating virtual environment..."
+	pip install virtualenv
+
+	virtualenv venv
+
+
+	source venv/Scripts/activate
+	echo "Virtual Environment has been successfully created."
+
+	echo "Installing dependencies..."
+	pip3 install -r data/requirements.txt
+	echo "Dependencies has been successfully installed."
+
+	export THONUNBUFFERED=1
+	export FLASK_APP=run.py
+	export FLASK_DEBUG=1
+
+	venv/Scripts/flask run
+fi
